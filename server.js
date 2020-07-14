@@ -11,7 +11,7 @@ const app = express();
 /* Middleware*/
 //Here we are configuring express to use body-parser as middle-ware.
 const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Cors for cross origin allowance
@@ -27,7 +27,7 @@ app.use(express.static('website'));
  * @description This is get route which return projectData
  * @returns {Object<projectData>} projectData  
  */
-app.get("/all", (req, res) => {
+app.get("/getData", (req, res) => {
     res.send(projectData);
 })
 
@@ -35,11 +35,11 @@ app.get("/all", (req, res) => {
  * @description This is post route which receive three key point 
  *  temperature , date ,user response and add them to projectData
  */
-app.get("/all", (req, res) => {
-    const {temperature,date,userResponse} = req.body
-    projectData.temperature = temperature
-    projectData.date = date
-    projectData.userResponse = userResponse
+app.post("/postData", (req, res) => {
+    projectData.temperature = req.body.temperature;
+    projectData.date = req.body.date;
+    projectData.userResponse = req.body.userResponse;
+    res.sendStatus(200)
 })
 
 // Setup Server
