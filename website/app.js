@@ -1,15 +1,15 @@
 
 /* Global Variables */
 const api_key = "5677c1ea2c80ec54d1dfc0cba02883f9";
-const url = "https://api.openweathermap.org/data/2.5/weather"
+const url = "https://api.openweathermap.org/data/2.5/weather";
 
 //Dom Element
-let generateButton = document.querySelector("#generate")
-let zipInput = document.querySelector("#zip")
-let textarea = document.querySelector("#feelings")
-
-let dateOutput = document.querySelector("#date") 
-let tempOutput = document.querySelector("#temp")
+let generateButton = document.querySelector("#generate");
+let zipInput = document.querySelector("#zip");
+let feelingsTextArea = document.querySelector("#feelings");
+let loading = document.querySelector(".loading");
+let dateOutput = document.querySelector("#date");
+let tempOutput = document.querySelector("#temp");
 let contentOutput = document.querySelector("#content")
 
 // Create a new date instance dynamically with JS
@@ -27,29 +27,46 @@ async function GetDataFromWeatherApi(url, zipCode, apiKey) {
         .then(response => response.json())
         .then(async(data) => {
             let temperature = data.main.temp;
-            let userResponse = textarea.value;
+            let userResponse = feelingsTextArea.value;
             let dataObject = { temperature :  temperature,
                  date : newDate,
                   userResponse: userResponse };
             await PostDataToServer("/postData", dataObject);
+        }).catch(error => {
+            console.log(error);
+        })
+}
+
+/**
+ * @description Get Data from server 
+ * @param {string} url this is the url of get data from server
+ */
+async function GetDataFromServer(url) {
+    await fetch(url)
+        .then(response => response.json())
+        .then((data) => {
+            UpdateUI(data);
         });
 }
 
 /**
- * @description Get Data from OpenWeatherMap website
- * @param {string} url this is the url of get data from server
+ * @description Update element ui with data reetive from server
+ * @param {Object} data 
  */
-async function GetDataFromServer(url) {
-    console.log(url)
-    await fetch(url)
-        .then(response => response.json())
-        .then((data) => {
-            console.log(data);
-            const { temperature, date, userResponse } = data;
-            dateOutput.innerHTML = date;
-            tempOutput.innerHTML = temperature;
-            contentOutput.innerHTML = userResponse;
-        });
+function UpdateUI(data) {
+    const { temperature, date, userResponse } = data;
+    dateOutput.innerHTML = `Date : ${date}`;
+    tempOutput.innerHTML = `temperature : ${temperature}`;
+    contentOutput.innerHTML = `your response : ${userResponse}`;
+}
+
+/**
+ * @description Empty element ui 
+ */
+function EmptyUI() {
+    dateOutput.innerHTML = "";
+    tempOutput.innerHTML = "";
+    contentOutput.innerHTML = "";
 }
 
 /**
@@ -72,7 +89,22 @@ async function PostDataToServer(url, dataObject) {
 
 // Event listener to add function to existing HTML DOM element
 generateButton.addEventListener("click", async () => {
+    //Empty UI if it data exist
+    EmptyUI();
+
     //Geting zip code from zip input value
-    let zipCode = zipInput.value
-    const response = await GetDataFromWeatherApi(url, zipCode, api_key)
+    let zipCode = zipInput.value;
+
+    //if the user forget to put zip code alert him 
+    if(zipCode == ""){
+        alert("zip code is needed ");
+        return ;
+    }
+    //toggle Loadin spin to show 
+    loading.classList.toggle("show");
+
+    await GetDataFromWeatherApi(url, zipCode, api_key);
+
+    //toggle Loadin spin to hide
+    loading.classList.toggle("show");
 })

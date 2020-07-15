@@ -11,11 +11,11 @@ const app = express();
 /* Middleware*/
 //Here we are configuring express to use body-parser as middle-ware.
 const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Cors for cross origin allowance
-const cors = require("cors")
+const cors = require("cors");
 app.use(cors());
 
 // Initialize the main project folder
@@ -23,23 +23,18 @@ app.use(express.static('website'));
 
 //Initialize Routes
 
-/**
- * @description This is get route which return projectData
- * @returns {Object<projectData>} projectData  
- */
+//This is get route which send back  projectData
 app.get("/getData", (req, res) => {
     res.send(projectData);
 })
 
-/**
- * @description This is post route which receive three key point 
- *  temperature , date ,user response and add them to projectData
- */
+//This is post route which receive three key point 
+//temperature , date ,user response and add them to projectData
 app.post("/postData", (req, res) => {
     projectData.temperature = req.body.temperature;
     projectData.date = req.body.date;
     projectData.userResponse = req.body.userResponse;
-    res.sendStatus(200)
+    res.sendStatus(200);
 })
 
 // Setup Server
